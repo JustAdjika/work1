@@ -13,6 +13,6 @@ export interface User {
 };
 
 export interface Session {
-    sessionToken: string,
+    hashSessionToken: string,
     userId: number
 };

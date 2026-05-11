@@ -27,5 +27,10 @@ export interface getUserResponseDto {
 };
 
 
+export interface getAllUserResponseDto {
+    userList: responseUserDto[]
+};
+
+
 
 export type responseUserDto = Omit<UserTypes.User, "password">;

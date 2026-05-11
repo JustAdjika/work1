@@ -69,7 +69,6 @@ export default class UserService {
         };
     };
 
-
     // Получить одного
     static async getData(targetId: number) {
         try {
@@ -78,10 +77,40 @@ export default class UserService {
 
             const { password, ...safeUser } = foundUser.toJSON();
 
-            return safeUser;
+            return safeUser as DTO.responseUserDto;
         } catch (e) {
             if(e instanceof ApiError) throw new ApiError(e.message, e.status);
             else throw new ApiError('getData at UserService error: Unexpected error', 500);
+        };
+    };
+
+    // Получить всех
+    static async getAll() {
+        try {
+            const userList = await UserRepository.findAll();
+
+            const plainUsers = userList.map(user => user.toJSON());
+            const safeUsers = plainUsers.map( ({ password, ...rest }) => rest );
+
+            return safeUsers as DTO.responseUserDto[];
+        } catch (e) {
+            if(e instanceof ApiError) throw new ApiError(e.message, e.status);
+            else throw new ApiError('getAll at UserService error: Unexpected error', 500);
+        };
+    }
+
+    // Заблокировать
+    static async ban(targetId: number) {
+        try {
+            const foundUser = await UserRepository.findById(targetId);
+            if( !foundUser ) throw new ApiError('ban at UserService error: User undefined', 404);
+
+            if(foundUser.dataValues.status === 'blocked') throw new ApiError('ban at UserService error: User already banned', 409);
+            
+            await UserRepository.updateStatus(foundUser.dataValues.id, 'blocked')
+        } catch (e) {
+            if(e instanceof ApiError) throw new ApiError(e.message, e.status);
+            else throw new ApiError('ban at UserService error: Unexpected error', 500);
         };
     }
 };

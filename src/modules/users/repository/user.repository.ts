@@ -14,6 +14,10 @@ export default class UserRepository {
         return await Users.findOne({ where: { id } });
     };
 
+    static async findAll() {
+        return await Users.findAll();
+    }
+
     static async create(fullName: string, birthDate: Date, email: string, hashPassword: string) {
         return await Users.create({
             fullName,
@@ -33,4 +37,11 @@ export default class UserRepository {
 
         return await Users.findOne({ where: { id: parsedSession.userId } })
     }
+
+    static async updateStatus(userId: number, status: UserTypes.status) {
+        const foundUser = await Users.findOne({ where: { id: userId } });
+        if( !foundUser ) throw new ApiError('updateStatus at UserService error: User undefined', 404);
+
+        await foundUser.update({ status });
+    } 
 }
