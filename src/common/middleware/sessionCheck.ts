@@ -2,19 +2,16 @@ import type { NextFunction, Request, Response } from "express";
 import bcrypt from 'bcrypt';
 
 import { ApiError } from "../error.entity.ts";
-import { redis } from "../../database/redis/redis.ts";
+import redis from "../../database/redis/redis.ts";
 import { sendResponse } from "../utilities/response.ts";
 
 import * as UserTypes from '../../modules/users/types/user.types.ts'
 
 export default async function SessionCheck(req: Request, res: Response, next: NextFunction) {
     try {
-        const {
-            sessionId,
-            sessionToken
-        } = req.body;
+        const [ sessionId, sessionToken ] = [ req.headers['x-session-id'], req.headers['authorization']?.replace('Bearer ', '')];
 
-        if( !sessionId || !sessionToken ) throw new ApiError(`Input data is incorrect`, 400, req);
+        if( !sessionId || !sessionToken || Array.isArray(sessionId) ) throw new ApiError(`Input data is incorrect`, 400, req);
 
         const foundSession = await redis.get(sessionId);
 
@@ -23,6 +20,10 @@ export default async function SessionCheck(req: Request, res: Response, next: Ne
         const parsedSession = JSON.parse(foundSession) as UserTypes.Session;
 
         if( !await bcrypt.compare(sessionToken, parsedSession.hashSessionToken) ) throw new ApiError('Session is invalid', 403, req);
+
+        req.userId = parsedSession.userId;
+        req.sessionToken = parsedSession.hashSessionToken;
+        req.sessionId = sessionId;
 
         next();
     } catch (e) {

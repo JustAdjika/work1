@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 import * as DTO from '../dto/user.dto.ts';
 
-import { redis } from '../../../database/redis/redis.ts';
+import redis from '../../../database/redis/redis.ts';
 
 import { ApiError } from "../../../common/error.entity.ts";
 import { dataCheck } from "../../../common/utilities/dataCheck.ts";

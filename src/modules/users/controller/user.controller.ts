@@ -68,7 +68,7 @@ router.post('/login', async(req, res) => {
     }
 });
 
-router.post('/personal/:id', SessionCheck, PermsCheck.isAdmin(PermsCheck.isOwner()), async(req, res) => {
+router.get('/personal/:id', SessionCheck, PermsCheck.isAdmin(PermsCheck.isOwner()), async(req, res) => {
     try {
         const foundUser = await UserService.getData(Number(req.params.id));
 
@@ -77,7 +77,7 @@ router.post('/personal/:id', SessionCheck, PermsCheck.isAdmin(PermsCheck.isOwner
         sendResponse<DTO.getUserResponseDto>(
             res, 
             200, 
-            `${req.method} ${req.baseUrl}${req.path}: User ${req.params.id} information received (${req.body.sessionId})`,
+            `${req.method} ${req.baseUrl}${req.path}: User ${req.params.id} information received (${req.sessionId})`,
             { userData: foundUser }
         );
     } catch (e) {
@@ -86,14 +86,14 @@ router.post('/personal/:id', SessionCheck, PermsCheck.isAdmin(PermsCheck.isOwner
     }
 });
 
-router.post('/all', SessionCheck, PermsCheck.isAdmin(), async(req, res) => {
+router.get('/all', SessionCheck, PermsCheck.isAdmin(), async(req, res) => {
     try {
         const userList = await UserService.getAll();
 
         sendResponse<DTO.getAllUserResponseDto>(
             res, 
             200, 
-            `${req.method} ${req.baseUrl}${req.path}: User information list received (${req.body.sessionId})`,
+            `${req.method} ${req.baseUrl}${req.path}: User information list received (${req.sessionId})`,
             { userList }
         );
     } catch (e) {
@@ -111,7 +111,7 @@ router.patch('/ban/:id', SessionCheck, PermsCheck.isAdmin(PermsCheck.isOwner()),
         sendResponse(
             res, 
             200, 
-            `${req.method} ${req.baseUrl}${req.path}: User ${req.params.id} banned (${req.body.sessionId})`,
+            `${req.method} ${req.baseUrl}${req.path}: User ${req.params.id} banned (${req.sessionId})`,
         );
     } catch (e) {
         if(e instanceof ApiError) sendResponse(res, e.status, e.message);

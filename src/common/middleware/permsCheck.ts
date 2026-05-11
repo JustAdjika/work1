@@ -5,8 +5,14 @@ import UserRepository from "../../modules/users/repository/user.repository.ts";
 import RoleGuard from "../../modules/users/guards/role.guard.ts";
 import { sendResponse } from "../utilities/response.ts";
 
-// Колбэк функция для возможности проверки на администратора и владельца комплексно
-type callbackType = RequestHandler;
+const validator = async(req: Request) => {
+    if( !req.userId ) throw new ApiError(`User undefined`, 404, req);
+
+    const executer = await UserRepository.findById(req.userId);
+    if( !executer ) throw new ApiError('Executer undefined', 404, req);
+
+    return executer;
+}
 
 export default class PermsCheck {
 
@@ -14,15 +20,7 @@ export default class PermsCheck {
     static isAdmin(action: RequestHandler = () => { throw new ApiError('Forbidden', 403) }) {
         return async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const {
-                    sessionId,
-                    sessionToken
-                } = req.body;
-        
-                if( !sessionId || !sessionToken ) throw new ApiError(`Input data is incorrect`, 400, req);
-        
-                const executer = await UserRepository.findBySessionId(sessionId);
-                if( !executer ) throw new ApiError('Executer undefined', 404, req);
+                const executer = await validator(req);
         
                 if( !await RoleGuard.is('admin', executer.dataValues.id) ) return action(req, res, next);
 
@@ -40,15 +38,7 @@ export default class PermsCheck {
 
         return async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const {
-                    sessionId,
-                    sessionToken
-                } = req.body;
-        
-                if( !sessionId || !sessionToken ) throw new ApiError(`Input data is incorrect`, 400, req);
-        
-                const executer = await UserRepository.findBySessionId(sessionId);
-                if( !executer ) throw new ApiError('Executer undefined', 404, req);
+                const executer = await validator(req);
         
                 if( executer.dataValues.id !== Number(req.params.id) ) return action(req, res, next);
 

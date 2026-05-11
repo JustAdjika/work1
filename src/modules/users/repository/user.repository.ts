@@ -1,5 +1,5 @@
 import { ApiError } from "../../../common/error.entity.ts";
-import { redis } from "../../../database/redis/redis.ts";
+import redis from "../../../database/redis/redis.ts";
 import Users from "../../../database/sql/users.db.ts";
 
 import * as UserTypes from "../types/user.types.ts";
