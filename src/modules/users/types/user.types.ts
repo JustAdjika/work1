@@ -11,3 +11,8 @@ export interface User {
     role: role,
     status: status
 };
+
+export interface Session {
+    sessionToken: string,
+    userId: number
+};

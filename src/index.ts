@@ -4,6 +4,7 @@ dotenv.config();
 import app from './app.ts'
 import sequelize from './database/sql/pool.ts';
 
+
 const PORT = process.env.SERVER_PORT || 3000;
 
 

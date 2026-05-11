@@ -2,11 +2,11 @@ import type { Response } from 'express';
 import * as UtilitiesTypes from '../types/utilities.types.ts';
 import { logger } from '../logger.ts';
 
-export function sendResponse(
+export function sendResponse<T = object>(
     res: Response,
     status: UtilitiesTypes.statusCode = 200,
     message?: string,
-    container?: object
+    container?: T
 ) {
     if(status === 500 && message) {
         logger.error(`Unexpected error: ${message}`);
