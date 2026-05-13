@@ -19,16 +19,11 @@ export default class PermsCheck {
     // проверка на администратора
     static isAdmin(action: RequestHandler = () => { throw new ApiError('Forbidden', 403) }) {
         return async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                const executer = await validator(req);
-        
-                if( !await RoleGuard.is('admin', executer.dataValues.id) ) return action(req, res, next);
+            const executer = await validator(req);
+    
+            if( !await RoleGuard.is('admin', executer.dataValues.id) ) return action(req, res, next);
 
-                next();
-            } catch (e) {
-                if(e instanceof ApiError) sendResponse(res, e.status, e.message);
-                else sendResponse(res, 500, `${req.method} ${req.baseUrl}${req.path}: Unexpected error`);
-            }
+            next();
         } 
 
     }
@@ -37,16 +32,11 @@ export default class PermsCheck {
     static isOwner(action: RequestHandler = () => { throw new ApiError('Forbidden', 403) } ) {
 
         return async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                const executer = await validator(req);
-        
-                if( executer.dataValues.id !== Number(req.params.id) ) return action(req, res, next);
+            const executer = await validator(req);
+    
+            if( executer.dataValues.id !== Number(req.params.id) ) return action(req, res, next);
 
-                next();
-            } catch (e) {
-                if(e instanceof ApiError) sendResponse(res, e.status, e.message);
-                else sendResponse(res, 500, `${req.method} ${req.baseUrl}${req.path}: Unexpected error`);
-            }
+            next();
         } 
 
     }
